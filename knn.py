@@ -3,11 +3,11 @@ import random
 import math
 import operator
 
-def loader(file, split, trainer = [], test = []):
-    with open(file, 'rb') as csvfile:
+def loader(filename, split, trainer = [], test = []):
+    with open(filename, 'rt') as csvfile:
         lines = csv.reader(csvfile)
         data = list(lines)
-        for x in range(len(data)):
+        for x in range(len(data) - 1):
             for y in range(4):
                 data[x][y] = float(data[x][y])
             if random.random() < split:
@@ -56,7 +56,15 @@ def main():
     tester = []
     split = 0.67
     loader('iris.data', split, trainer, tester)
+    print('--------------Trainer------------')
+    for i in trainer:
+        print(i)
+    print('---------------------------------')
     print('Train set: {}'.format(repr(len(trainer))))
+    print('-------------Tester--------------')
+    for i in tester:
+        print(i)
+    print('---------------------------------')
     print('Test set: {}'.format(repr(len(tester))))
     predictions = []
     k = 3
@@ -64,6 +72,10 @@ def main():
         neighbor = neighbors(trainer, tester[x], k)
         result = response(neighbor)
         predictions.append(result)
+    print('--------------Predictions--------------')
+    for i in predictions:
+        print(i)
+    print('---------------------------------------')
     acc = accuracy(tester, predictions)
     print('Accuracy: {}'.format(acc))
 
