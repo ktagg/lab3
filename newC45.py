@@ -48,7 +48,7 @@ class Node:
         self.children = []
 
 class C45:
-    def __init__(self, data, names):
+    def __init__(self, data, names,document):
         self.data = data
         self.names = names
         self.avals = {}
@@ -57,6 +57,8 @@ class C45:
         self.classes = []
         self.atts = -1
         self.tree = None
+        self.xmlDoc = document
+        self.currentSelection = ""
 
     def fetcher(self):       
         with open(self.names, "r") as file:
@@ -107,17 +109,10 @@ class C45:
                 obamaCount += 1
             elif(item[11] == 'McCain'):
                 mccainCount += 1
-        print('oCount')
-        print(obamaCount)
-        print('mccainCount')
-        print(mccainCount)
+
         obamaPR = obamaCount/(float(len(items)))
         mccainPR =  mccainCount/ (float(len(items)))
         
-        print('obamaPR')
-        print(obamaPR)
-        print('mccainPR')
-        print(mccainPR)
         
         if(obamaCount == 0 or mccainCount == 0):
             return 0
@@ -128,7 +123,7 @@ class C45:
     def getListOfSlices(self, currentClassIndex, classValues, items):
         listOfSlices = list()
         classValuesLen = len(classValues)
-        for i in range(0, classValuesLen):
+        for i in range(0, classValuesLen ):
             listOfSlices.append([])
          
         for i in range(0,classValuesLen):  
@@ -140,7 +135,8 @@ class C45:
                                             
         
         return listOfSlices                        
-    def calculateEntropyAI(self,listOfSlices,items):         
+    def calculateEntropyAI(self,listOfSlices,items): 
+        print ('entropyAI')        
         totalAmountOfItems = len(items) 
         totalEntropy = 0       
         entropies = []
@@ -164,9 +160,25 @@ class C45:
         print(totalEntropy)
         
         return totalEntropy  
+     
+    def mostFrequentItems(self,items):   
+        obamaCount = 0
+        mccainCount = 0
+        
+        for item in items:
+            if(item[11] == "Obama"):
+                obamaCount += 1
+            else:
+                mccainCount += 1
+        
+        if(obamaCount > mccainCount):
+            return 'Obama'
+        elif (obamaCount < mccainCount):
+            return 'McCain'
+        else:
+            return "Neither"
         
     def homogeneousCheck(self,items):
-
         if(len(items) == 0):
             return False                
         homoCheck = items[0][11]
@@ -178,52 +190,111 @@ class C45:
                 return False
         return True
                
-    def splitter(self, items, excludedClasses):
+    def splitter(self, items, excludedClasses,node):
         
         if(self.homogeneousCheck(items)):
-            items[0][11]
+            print('Im Homo')
             print('decision : ' + items[0][11])
-            
-        classIndex = 0
-        entropyD = self.calculateEntropyD(self.items) 
-        print("topLevel EntropyD")
-        print(entropyD)
-        maxAttributeIndex = 0
-        maxAttribute = ""
-        maxGain = 0.0             
-        for i in range(0, self.classes.__len__() - 1):
-            print('currentClass')
-            print(self.classes[i])
-            currentClass = self.classes[i]
-            currentClassIndex = i
-            
-            classValues = self.avals[currentClass]
-            listOfSlices = self.getListOfSlices(currentClassIndex, classValues, items)
-            print('list of slices')
-            print(listOfSlices)
-            totalEntropy = self.calculateEntropyAI(listOfSlices,items)
-            
-            informationGain = entropyD - totalEntropy
-            print('information gain')
-            print(informationGain)
-            
-            if(informationGain > maxGain):
-                maxAttributeIndex = i
-                maxAttribute = self.classes[maxAttributeIndex]
-                maxGain = informationGain            
-
-        excludedClasses[maxAttributeIndex] = True
+            newNode = self.xmlDoc.createElement('decision')
+            newNode.setAttribute('end', items[0][11])
+            node.appendChild(newNode)
         
-        print('firstrun')
-        print(maxAttribute)
-        print(maxGain)
+        elif(len(excludedClasses) ==  len(self.classes)):
+            print('decision :' + items[0][11]) 
+            newNode = self.xmlDoc.createElement('decision')
+            newNode.setAttribute('end', items[0][11])
+            node.appendChild(newNode)
+        elif(len(items) == 0):
+            newNode = self.xmlDoc.createElement('decision')
+            newNode.setAttribute('end', self.currentSelection)
+            node.appendChild(newNode)                     
+        else:
+            self.currentSelection = items[0][11]
+            entropyD = self.calculateEntropyD(items) 
+            print("topLevel EntropyD")
+            print(entropyD)
+            maxAttributeIndex = 0
+            maxAttribute = ""
+            maxGain = 0.0 
+            maxListOfSlices = []
+            classToSplitOn = " "
+             
+            print('items')
+            print(items)          
+            for i in range(0, self.classes.__len__() - 1):
+                
+                if( i not in excludedClasses):           
+                    print('currentClass')
+                    print(self.classes[i])
+                    currentClass = self.classes[i]
+                    currentClassIndex = i
+                    
+                    classValues = self.avals[currentClass]
+                    listOfSlices = self.getListOfSlices(currentClassIndex, classValues, items)
+                    print('list of slices')
+                    print(listOfSlices)
+                    totalEntropy = self.calculateEntropyAI(listOfSlices,items)
+                    
+                    informationGain = entropyD - totalEntropy
+                    print('information gain')
+                    print(informationGain)
+                    
+                    if(informationGain > maxGain):
+                        maxListOfSlices = listOfSlices
+                        classToSplitOn = currentClass
+                        maxAttributeIndex = i
+                        maxAttribute = self.classes[maxAttributeIndex]
+                        maxGain = informationGain   
+                    excludedClasses[maxAttributeIndex] = True  
+            
+            ## If the algorithm cannot choose an attribute to split on
+            if(classToSplitOn == " "):
+                mostFrequentItem = self.mostFrequentItems(items)
+                newNode = self.xmlDoc.createElement('decision')
+                newNode.setAttribute('end', items[0][11])
+                node.appendChild(newNode)                       
+            else:
+                newNode = self.xmlDoc.createElement('node')
+                newNode.setAttribute('var', classToSplitOn)
+                node.appendChild(newNode)            
+                                
+                attributeIndex = 0
+                classValues = self.avals[classToSplitOn]
+           
+
+                print('firstrun')
+                print(maxAttribute)
+                print(maxGain)
+                
+
+                print('listS')
+                print(listOfSlices)        
+                for list in maxListOfSlices:
+                    edge = self.xmlDoc.createElement('edge')
+                    print('classvalues')
+                    print(classValues)
+                    print(len(listOfSlices))  
+                    print(attributeIndex)                      
+                    edge.setAttribute('var ', classValues[attributeIndex])
+                    edge.setAttribute('num', str(attributeIndex + 1))           
+                    newNode.appendChild(edge)  
+                    self.splitter(list, excludedClasses, edge) 
+                    attributeIndex += 1                    
+                         
+
                    
-    def processData(self):
+    def processData(self, node):
         excludedClasses = {}       
-        self.splitter(self.items,excludedClasses)
+        self.splitter(self.items,excludedClasses,node)
 
 if __name__ == "__main__":
-    c = C45("tree03/tree03-20-words.csv", "domain.xml")
+    document = xml.dom.minidom.Document() 
+    node = document.createElement('Tree')
+    node.setAttribute('known', "Something")
+    document.appendChild(node)
+    
+    c = C45("tree03/tree03-20-words.csv", "domain.xml",document)
     c.fetcher()
-    c.processData()
+    c.processData(node)   
+    print (document.toprettyxml())
     
