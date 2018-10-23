@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<domain>
+	<variable name = "Sepal Length">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	<variable name = "Sepal Width">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	<variable name = "Petal Length">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	<variable name = "Petal Width">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	  	
+  	<Category name = "Iris Type">
+		<choice name = "Iris-setosa" type ="1" />
+		<choice name = "Iris-versicolor" type ="2" />
+		<choice name = "Iris-virginica" type = "3"/>
+	</Category>
+</domain>

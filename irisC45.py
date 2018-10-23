@@ -83,7 +83,7 @@ class C45:
         #self.classes = classAttributes
  
         self.classes = list(parser.categoryValues.keys())
-        self.decisionClassIndex = len(self.classes) 
+        self.decisionClassIndex = len(self.classes) -1
         self.atts = len(self.avals.keys())
         self.att = list(self.avals.keys())       
         lineCount = 0
@@ -99,30 +99,95 @@ class C45:
                         print(row)
                         self.items.append(row)
     def calculateEntropyD(self, items):
-        obamaCount = 0
-        mccainCount = 0
-        print('lengthofitems')
-        print(len(items))
+        setosaCount = 0
+        versicolorCount = 0
+        virginicaCount = 0
+        areZeroes = 0
+        entropy = 0
         if(len(items) == 0):
             return 0
-        print('items')
-        print(items)
+        #print(items)
         for item in items:
-            if(item[self.decisionClassIndex] == 'Obama'):
-                obamaCount += 1
-            elif(item[self.decisionClassIndex] == 'McCain'):
-                mccainCount += 1
+            if(item[self.decisionClassIndex] == 'Iris-setosa'):
+                setosaCount += 1
+            elif(item[self.decisionClassIndex] == 'Iris-versicolor'):
+                versicolorCount += 1
+            else:
+                virginicaCount += 1
 
-        obamaPR = obamaCount/(float(len(items)))
-        mccainPR =  mccainCount/ (float(len(items)))
+        setosaPR = setosaCount/(float(len(items)))
+        versicolorPR =  versicolorCount/ (float(len(items)))
+        virginicaPR = virginicaCount/ (float(len(items)))
         
-        
-        if(obamaCount == 0 or mccainCount == 0):
-            return 0
-
-        entropy = (-(obamaPR) * math.log2(obamaPR)) - ((mccainPR) * math.log2(mccainPR))
-        
+        if(versicolorCount == 0):
+            areZeroes += 1
+        if(virginicaCount == 0):
+            areZeroes +=1
+        if(setosaCount == 0):
+            areZeroes += 1
+          
+        if(areZeroes >= 2):
+            return 0;      
+        elif(setosaCount == 0):
+            entropy =  - ((versicolorPR) * math.log2(versicolorPR)) - ((virginicaPR) * math.log2(virginicaPR))
+        elif(versicolorCount == 0):
+            entropy =   - ((virginicaPR) * math.log2(virginicaPR)) - ((setosaPR) * math.log2(setosaPR)) 
+        elif(virginicaCount == 0):
+            (-(setosaPR) * math.log2(setosaPR)) - ((versicolorPR) * math.log2(versicolorPR))
+        else:
+            entropy = (-(setosaPR) * math.log2(setosaPR)) - ((versicolorPR) * math.log2(versicolorPR)) - ((virginicaPR) * math.log2(virginicaPR))
+  
         return entropy
+    def getNumericalSlices(self,currentClassIndex,items,entropyD):
+        listOfSlices = list()
+        bestGain = 0;
+        bestList1 = list()
+        bestList2 = list()
+        sortedList = list()
+        valueSplitOn = 0;
+        
+        sortedList = sorted(items , key=lambda x: x[currentClassIndex])
+        print('sorted')
+        print(currentClassIndex)
+        print(sortedList)
+        
+        for i in range(1, len(items)):
+            splitList1 = sortedList[:i]
+            splitList2 = sortedList[i:]
+            
+            entropy1 = self.calculateEntropyD(splitList1)
+            entropy2 = self.calculateEntropyD(splitList2)
+            
+            totalEntropy = entropy1 * (len(splitList1)/len(items)) + entropy2 * (len(splitList2)/len(items))
+            
+            print(splitList1)
+            print(splitList2)
+            informationGain = entropyD - totalEntropy
+            print('infoGain')
+            print(totalEntropy)
+            print(entropyD)
+            print(informationGain)
+            
+            if(informationGain >= bestGain):
+               bestGain = informationGain
+               bestList1 = splitList1
+               bestList2 = splitList2 
+               
+
+        print('value')       
+        print(bestList1)
+        print(bestList2)
+        valueSplitOn = bestList2[0]  
+        listOfSlices.append(bestList1)
+        listOfSlices.append(bestList2)
+        
+        print('here')
+        print(sortedList)
+        print(valueSplitOn)
+        floatSplitOn = valueSplitOn[currentClassIndex]       
+        
+        return (listOfSlices,floatSplitOn)
+                    
     def getListOfSlices(self, currentClassIndex, classValues, items):
         listOfSlices = list()
         classValuesLen = len(classValues)
@@ -141,6 +206,7 @@ class C45:
     def calculateEntropyAI(self,listOfSlices,items): 
         print ('entropyAI')        
         totalAmountOfItems = len(items) 
+        print(listOfSlices)
         totalEntropy = 0       
         entropies = []
                 
@@ -165,25 +231,32 @@ class C45:
         return totalEntropy  
      
     def mostFrequentItems(self,items):   
-        obamaCount = 0
-        mccainCount = 0
+        setosaCount = 0
+        versicolorCount = 0
+        virginicaCount = 0
         
         for item in items:
-            if(item[self.decisionClassIndex] == "Obama"):
-                obamaCount += 1
+            if(item[self.decisionClassIndex] == 'Iris-setosa'):
+                setosaCount += 1
+            elif(item[self.decisionClassIndex] == 'Iris-versicolor'):
+                versicolorCount += 1
             else:
-                mccainCount += 1
-        
-        if(obamaCount > mccainCount):
-            return 'Obama'
-        elif (obamaCount < mccainCount):
-            return 'McCain'
+                virginicaCount += 1
+                
+        if(setosaCount > versicolorCount and setosaCount > virginicaCount ):
+            return 'Iris-setosa'
+        elif (setosaCount < versicolorCount and virginicaCount < versicolorCount):
+            return 'Iris-versicolor'
+        elif(virginicaCount > versicolorCount and virginicaCount > setosaCount):
+            return 'Iris-virginica'
         else:
             return "Neither"
         
     def homogeneousCheck(self,items):
         if(len(items) == 0):
-            return False                
+            return False 
+        print(self.decisionClassIndex)   
+        print(items)            
         homoCheck = items[0][self.decisionClassIndex]
         print('homo')
         print(homoCheck)
@@ -221,7 +294,8 @@ class C45:
             maxGain = 0.0 
             maxListOfSlices = []
             classToSplitOn = " "
-             
+            valueSplitOn = 0.0
+            
             print('items')
             print(items)          
             for i in range(0, self.classes.__len__() - 1):
@@ -233,22 +307,45 @@ class C45:
                     currentClassIndex = i
                     
                     classValues = self.avals[currentClass]
-                    listOfSlices = self.getListOfSlices(currentClassIndex, classValues, items)
-                    print('list of slices')
-                    print(listOfSlices)
-                    totalEntropy = self.calculateEntropyAI(listOfSlices,items)
+                    print(len(classValues))
                     
-                    informationGain = entropyD - totalEntropy
-                    print('information gain')
-                    print(informationGain)
-                    
-                    if(informationGain > maxGain):
-                        maxListOfSlices = listOfSlices
-                        classToSplitOn = currentClass
-                        maxAttributeIndex = i
-                        maxAttribute = self.classes[maxAttributeIndex]
-                        maxGain = informationGain   
-                    excludedClasses[maxAttributeIndex] = True  
+                    if(len(classValues) > 1):                   
+                        listOfSlices = self.getListOfSlices(currentClassIndex, classValues, items)
+                        print('list of slices')
+                        print(listOfSlices)
+                        totalEntropy = self.calculateEntropyAI(listOfSlices,items)
+                        
+                        informationGain = entropyD - totalEntropy
+                        print('information gain')
+                        print(informationGain)
+                        
+                        if(informationGain > maxGain):
+                            maxListOfSlices = listOfSlices
+                            classToSplitOn = currentClass
+                            maxAttributeIndex = i
+                            maxAttribute = self.classes[maxAttributeIndex]
+                            maxGain = informationGain   
+                        excludedClasses[maxAttributeIndex] = True  
+                    else:
+                        print ("whe")
+                        listOfSlices,valueSplitOn = self.getNumericalSlices(currentClassIndex,items, entropyD)
+                        print('list')
+                        print(listOfSlices)
+                        print(valueSplitOn)
+                        
+                        totalEntropy = self.calculateEntropyAI(listOfSlices,items)
+                        
+                        informationGain = entropyD - totalEntropy
+                        print('information gain')
+                        print(informationGain)
+                        
+                        if(informationGain > maxGain):
+                            maxListOfSlices = listOfSlices
+                            classToSplitOn = currentClass
+                            maxAttributeIndex = i
+                            maxAttribute = self.classes[maxAttributeIndex]
+                            maxGain = informationGain                       
+                        
             
             ## If the algorithm cannot choose an attribute to split on
             if(classToSplitOn == " "):
@@ -271,18 +368,27 @@ class C45:
                 
 
                 print('listS')
-                print(listOfSlices)        
+                print(listOfSlices)       
                 for list in maxListOfSlices:
                     edge = self.xmlDoc.createElement('edge')
                     print('classvalues')
                     print(classValues)
                     print(len(listOfSlices))  
-                    print(attributeIndex)                      
-                    edge.setAttribute('var ', classValues[attributeIndex])
-                    edge.setAttribute('num', str(attributeIndex + 1))           
+                    print(attributeIndex)
+                    if(len(classValues) > 1):                                      
+                        edge.setAttribute('var ', classValues[attributeIndex])
+                        edge.setAttribute('num', str(attributeIndex + 1))           
+                        newNode.appendChild(edge)  
+                        self.splitter(list, excludedClasses, edge) 
+                        attributeIndex += 1 
+                    else:
+                        if(attributeIndex > 0):
+                            edge.setAttribute('var ', 'LT ' + str(valueSplitOn))          
+                        else:
+                            edge.setAttribute('var ', 'GTE ' + str(valueSplitOn))                                   
                     newNode.appendChild(edge)  
                     self.splitter(list, excludedClasses, edge) 
-                    attributeIndex += 1                    
+                    attributeIndex += 1                   
                          
 
                    
@@ -296,7 +402,7 @@ if __name__ == "__main__":
     node.setAttribute('known', "Something")
     document.appendChild(node)
     
-    c = C45("tree03/tree03-20-words.csv", "domain.xml",document)
+    c = C45("iris/iris.data", "iris/domain.xml",document)
     c.fetcher()
     c.processData(node)   
     print (document.toprettyxml())
