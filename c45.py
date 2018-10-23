@@ -59,6 +59,7 @@ class C45:
         self.tree = None
         self.xmlDoc = document
         self.currentSelection = ""
+        self.decisionClassIndex = 0
 
     def fetcher(self):       
         with open(self.names, "r") as file:
@@ -80,7 +81,9 @@ class C45:
                 self.avals[attributeKey] = values 
                                
         #self.classes = classAttributes
+ 
         self.classes = list(parser.categoryValues.keys())
+        self.decisionClassIndex = len(self.classes) 
         self.atts = len(self.avals.keys())
         self.att = list(self.avals.keys())       
         lineCount = 0
@@ -105,9 +108,9 @@ class C45:
         print('items')
         print(items)
         for item in items:
-            if(item[11] == 'Obama'):
+            if(item[self.decisionClassIndex] == 'Obama'):
                 obamaCount += 1
-            elif(item[11] == 'McCain'):
+            elif(item[self.decisionClassIndex] == 'McCain'):
                 mccainCount += 1
 
         obamaPR = obamaCount/(float(len(items)))
@@ -166,7 +169,7 @@ class C45:
         mccainCount = 0
         
         for item in items:
-            if(item[11] == "Obama"):
+            if(item[self.decisionClassIndex] == "Obama"):
                 obamaCount += 1
             else:
                 mccainCount += 1
@@ -181,12 +184,12 @@ class C45:
     def homogeneousCheck(self,items):
         if(len(items) == 0):
             return False                
-        homoCheck = items[0][11]
+        homoCheck = items[0][self.decisionClassIndex]
         print('homo')
         print(homoCheck)
         
         for item in items:
-            if(item[11] != homoCheck):
+            if(item[self.decisionClassIndex] != homoCheck):
                 return False
         return True
                
@@ -194,22 +197,22 @@ class C45:
         
         if(self.homogeneousCheck(items)):
             print('Im Homo')
-            print('decision : ' + items[0][11])
+            print('decision : ' + items[0][self.decisionClassIndex])
             newNode = self.xmlDoc.createElement('decision')
-            newNode.setAttribute('end', items[0][11])
+            newNode.setAttribute('end', items[0][self.decisionClassIndex])
             node.appendChild(newNode)
         
         elif(len(excludedClasses) ==  len(self.classes)):
-            print('decision :' + items[0][11]) 
+            print('decision :' + items[0][self.decisionClassIndex]) 
             newNode = self.xmlDoc.createElement('decision')
-            newNode.setAttribute('end', items[0][11])
+            newNode.setAttribute('end', items[0][self.decisionClassIndex])
             node.appendChild(newNode)
         elif(len(items) == 0):
             newNode = self.xmlDoc.createElement('decision')
             newNode.setAttribute('end', self.currentSelection)
             node.appendChild(newNode)                     
         else:
-            self.currentSelection = items[0][11]
+            self.currentSelection = items[0][self.decisionClassIndex]
             entropyD = self.calculateEntropyD(items) 
             print("topLevel EntropyD")
             print(entropyD)
@@ -251,7 +254,7 @@ class C45:
             if(classToSplitOn == " "):
                 mostFrequentItem = self.mostFrequentItems(items)
                 newNode = self.xmlDoc.createElement('decision')
-                newNode.setAttribute('end', items[0][11])
+                newNode.setAttribute('end', items[0][self.decisionClassIndex])
                 node.appendChild(newNode)                       
             else:
                 newNode = self.xmlDoc.createElement('node')
