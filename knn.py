@@ -15,6 +15,31 @@ def loader(filename, split, trainer = [], test = []):
             else:
                 test.append(data[x])
 
+def loader2(filename, split, trainer = [], test = []):
+    with open(filename, 'rt') as csvfile:
+        lines = csv.reader(csvfile)
+        data = list(lines)
+        for x in range(len(data) - 1):
+            for y in range(16):
+                data[x][y + 1] = float(data[x][y + 1])
+            if random.random() < split:
+                trainer.append(data[x])
+            else:
+                test.append(data[x])
+
+def loader3(filename, split, trainer = [], test = []):
+    with open(filename, 'rt') as csvfile:
+        lines = csv.reader(csvfile)
+        data = list(lines)
+        for x in range(len(data) - 1):
+            for y in range(23):
+                print(data[x])
+                data[x][y] = float(ord(data[x][y]))
+            if random.random() < split:
+                trainer.append(data[x])
+            else:
+                test.append(data[x])
+
 def distance(i1, i2, length):
     distancer = 0
     for x in range(length):
@@ -26,6 +51,25 @@ def neighbors(training, tester, k):
     length = len(tester) - 1
     for x in range(len(training)):
         dist = distance(tester, training[x], length)
+        distances.append((training[x], dist))
+    distances.sort(key = operator.itemgetter(1))
+    neighbor = []
+    for x in range(k):
+        neighbor.append(distances[x][0])
+    return neighbor
+
+
+def distance2(i1, i2, length):
+    distancer = 0
+    for x in range(length - 1):
+        distancer += pow((i1[x + 1] - i2[x + 1]), 2)
+    return math.sqrt(distancer)
+
+def neighbors2(training, tester, k):
+    distances = []
+    length = len(tester) - 1
+    for x in range(len(training)):
+        dist = distance2(tester, training[x], length)
         distances.append((training[x], dist))
     distances.sort(key = operator.itemgetter(1))
     neighbor = []
@@ -78,5 +122,59 @@ def main():
     print('---------------------------------------')
     acc = accuracy(tester, predictions)
     print('Accuracy: {}'.format(acc))
+    print('###############################Second Set############################')
+    trainer = []
+    tester = []
+    loader2('letter-recognition.data.csv', split, trainer, tester)
+    print('--------------Trainer------------')
+    for i in trainer:
+        print(i)
+    print('---------------------------------')
+    print('Train set: {}'.format(repr(len(trainer))))
+    print('-------------Tester--------------')
+    for i in tester:
+        print(i)
+    print('---------------------------------')
+    print('Test set: {}'.format(repr(len(tester))))
+    predictions = []
+    k = 3
+    for x in range(len(tester)):
+        neighbor = neighbors2(trainer, tester[x], k)
+        result = response(neighbor)
+        predictions.append(result)
+    print('--------------Predictions--------------')
+    for i in predictions:
+        print(i)
+    print('---------------------------------------')
+    acc = accuracy(tester, predictions)
+    print('Accuracy: {}'.format(acc))
+    print('############################Third Set######################')
+    tester = []
+    trainer = []
+    loader3('agaricus-lepiota.data.csv', split, trainer, tester)
+    print('--------------Trainer------------')
+    for i in trainer:
+        print(i)
+    print('---------------------------------')
+    print('Train set: {}'.format(repr(len(trainer))))
+    print('-------------Tester--------------')
+    for i in tester:
+        print(i)
+    print('---------------------------------')
+    print('Test set: {}'.format(repr(len(tester))))
+    predictions = []
+    k = 3
+    for x in range(len(tester)):
+        neighbor = neighbors(trainer, tester[x], k)
+        result = response(neighbor)
+        predictions.append(result)
+    print('--------------Predictions--------------')
+    for i in predictions:
+        print(i)
+    print('---------------------------------------')
+    acc = accuracy(tester, predictions)
+    print('Accuracy: {}'.format(acc))
+
+
 
 main()
