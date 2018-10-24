@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<domain>
+	<variable name = "Cap Shape">
+		<group name = "b" p ="0" />
+		<group name = "c" p ="0" />
+		<group name = "x" p ="0" />
+		<group name = "f" p ="0" />
+		<group name = "k" p ="0" />
+		<group name = "s" p ="0" />
+	</variable>
+	
+	<variable name = "Cap Surface">
+		<group name = "f" p ="0" />
+		<group name = "g" p ="0" />
+		<group name = "y" p ="0" />
+		<group name = "s" p ="0" />
+	</variable>	
+	<variable name = "Cap Color">
+		<group name = "n" p ="0" />
+		<group name = "b" p ="0" />
+		<group name = "c" p ="0" />
+		<group name = "g" p ="0" />
+		<group name = "r" p ="0" />
+		<group name = "p" p ="0" />
+		<group name = "u" p ="0" />
+		<group name = "e" p ="0" />
+		<group name = "w" p ="0" />
+		<group name = "y" p ="0" />
+	</variable>
+	<variable name = "Bruises">
+		<group name = "t" p ="0" />
+		<group name = "f" p ="0" />
+	</variable>
+		<variable name = "Odor">
+		<group name = "a" p ="0" />
+		<group name = "l" p ="0" />
+		<group name = "c" p ="0" />
+		<group name = "y" p ="0" />
+		<group name = "f" p ="0" />
+		<group name = "m" p ="0" />
+		<group name = "n" p ="0" />
+		<group name = "p" p ="0" />
+		<group name = "s" p ="0" />	
+	</variable>
+		<variable name = "Gill-attachment">
+		<group name = "Numerical" p ="0" />
+	</variable>
+		<variable name = "Gill-spacing">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	</variable>
+		<variable name = "Gill-size">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	</variable>
+		<variable name = "Gill-color">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	</variable>
+		<variable name = "Stalk-shape">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	</variable>
+		<variable name = "Stalk-root">
+		<group name = "Numerical" p ="0" />
+	</variable>		
+	</variable>
+		<variable name = "Stalk-surface-above-ring">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	</variable>
+		<variable name = "Stalk-surface-below-ring">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	</variable>
+		<variable name = "Stalk-color-above-ring">
+		<group name = "Numerical" p ="0" />
+	</variable>		
+	</variable>
+		<variable name = "Stalk-color-below-ring">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	
+	</variable>
+		<variable name = "veil-type">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	</variable>
+		<variable name = "veil-color">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	</variable>
+		<variable name = "ring-number">
+		<group name = "Numerical" p ="0" />
+	</variable>		
+	</variable>
+		<variable name = "ring-type">
+		<group name = "Numerical" p ="0" />
+	</variable>		  	
+
+	</variable>
+		<variable name = "spore-print-color">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	</variable>
+		<variable name = "population">
+		<group name = "Numerical" p ="0" />
+	</variable>		
+	</variable>
+		<variable name = "habitat">
+		<group name = "Numerical" p ="0" />
+	</variable>			
+	
+  	<Category name = "Iris Type">
+		<choice name = "Edible" type ="1" />
+		<choice name = "Poisonous" type = "2"/>
+	</Category>
+</domain>

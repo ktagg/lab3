@@ -2,7 +2,6 @@ import math
 import pdb
 import html.parser
 import xml.dom.minidom
-from platform import node
 
 class MyHTMLParser( html.parser.HTMLParser):
     categoryValues = {}
@@ -100,43 +99,43 @@ class C45:
                         print(row)
                         self.items.append(row)
     def calculateEntropyD(self, items):
-        setosaCount = 0
-        versicolorCount = 0
-        virginicaCount = 0
+        kamaCount = 0
+        rosaCount = 0
+        canadianCount = 0
         areZeroes = 0
         entropy = 0
         if(len(items) == 0):
             return 0
         #print(items)
         for item in items:
-            if(item[self.decisionClassIndex] == 'Iris-setosa'):
-                setosaCount += 1
-            elif(item[self.decisionClassIndex] == 'Iris-versicolor'):
-                versicolorCount += 1
+            if(item[self.decisionClassIndex] == '1'):
+                kamaCount += 1
+            elif(item[self.decisionClassIndex] == '2'):
+                rosaCount += 1
             else:
-                virginicaCount += 1
+                canadianCount += 1
 
-        setosaPR = setosaCount/(float(len(items)))
-        versicolorPR =  versicolorCount/ (float(len(items)))
-        virginicaPR = virginicaCount/ (float(len(items)))
+        PR1 = kamaCount/(float(len(items)))
+        PR2 =  rosaCount/ (float(len(items)))
+        PR3 = canadianCount/ (float(len(items)))
         
-        if(versicolorCount == 0):
+        if(rosaCount == 0):
             areZeroes += 1
-        if(virginicaCount == 0):
+        if(canadianCount == 0):
             areZeroes +=1
-        if(setosaCount == 0):
+        if(kamaCount == 0):
             areZeroes += 1
           
         if(areZeroes >= 2):
             return 0;      
-        elif(setosaCount == 0):
-            entropy =  - ((versicolorPR) * math.log2(versicolorPR)) - ((virginicaPR) * math.log2(virginicaPR))
-        elif(versicolorCount == 0):
-            entropy =   - ((virginicaPR) * math.log2(virginicaPR)) - ((setosaPR) * math.log2(setosaPR)) 
-        elif(virginicaCount == 0):
-            (-(setosaPR) * math.log2(setosaPR)) - ((versicolorPR) * math.log2(versicolorPR))
+        elif(kamaCount == 0):
+            entropy =  - ((PR2) * math.log2(PR2)) - ((PR3) * math.log2(PR3))
+        elif(rosaCount == 0):
+            entropy =   - ((PR3) * math.log2(PR3)) - ((PR1) * math.log2(PR1)) 
+        elif(canadianCount == 0):
+            (-(PR1) * math.log2(PR1)) - ((PR2) * math.log2(PR2))
         else:
-            entropy = (-(setosaPR) * math.log2(setosaPR)) - ((versicolorPR) * math.log2(versicolorPR)) - ((virginicaPR) * math.log2(virginicaPR))
+            entropy = (-(PR1) * math.log2(PR1)) - ((PR2) * math.log2(PR2)) - ((PR3) * math.log2(PR3))
   
         return entropy
     def getNumericalSlices(self,currentClassIndex,items,entropyD):
@@ -148,10 +147,6 @@ class C45:
         valueSplitOn = 0;
         
         sortedList = sorted(items , key=lambda x: x[currentClassIndex])
-        print('sorted')
-        print(currentClassIndex)
-        print(sortedList)
-        
         for i in range(1, len(items)):
             splitList1 = sortedList[:i]
             splitList2 = sortedList[i:]
@@ -168,16 +163,12 @@ class C45:
                bestList1 = splitList1
                bestList2 = splitList2 
                
+
         valueSplitOn = bestList2[0]  
         listOfSlices.append(bestList1)
         listOfSlices.append(bestList2)
-        
-        print('here')
-        print(sortedList)
-        print(valueSplitOn)
-        floatSplitOn = valueSplitOn[currentClassIndex]  
-        print('floatsplitOn')
-        print(floatSplitOn)     
+
+        floatSplitOn = valueSplitOn[currentClassIndex]       
         
         return (listOfSlices,floatSplitOn)
                     
@@ -196,8 +187,7 @@ class C45:
                                             
         
         return listOfSlices                        
-    def calculateEntropyAI(self,listOfSlices,items): 
-        print ('entropyAI')        
+    def calculateEntropyAI(self,listOfSlices,items):        
         totalAmountOfItems = len(items) 
         print(listOfSlices)
         totalEntropy = 0       
@@ -205,7 +195,6 @@ class C45:
                 
         for sliceList in listOfSlices:
             entropy = self.calculateEntropyD(sliceList)
-            print('entropy')
             print(entropy)
             entropies.append(entropy)
                 
@@ -213,46 +202,39 @@ class C45:
         for entropy in entropies:
             sliceLen = len(listOfSlices[entropyIndex])                   
             sliceListEntrophy = entropy * (float(sliceLen)/ float(totalAmountOfItems))
-            print('slice')
-            print(sliceListEntrophy)
             totalEntropy += sliceListEntrophy  
             entropyIndex += 1  
         
-        print('total entrophy')
         print(totalEntropy)
         
         return totalEntropy  
      
     def mostFrequentItems(self,items):   
-        setosaCount = 0
-        versicolorCount = 0
-        virginicaCount = 0
+        kamaCount = 0
+        rosaCount = 0
+        canadianCount = 0
         
         for item in items:
-            if(item[self.decisionClassIndex] == 'Iris-setosa'):
-                setosaCount += 1
-            elif(item[self.decisionClassIndex] == 'Iris-versicolor'):
-                versicolorCount += 1
+            if(item[self.decisionClassIndex] == 1):
+                kamaCount += 1
+            elif(item[self.decisionClassIndex] == 2):
+                rosaCount += 1
             else:
-                virginicaCount += 1
+                canadianCount += 1
                 
-        if(setosaCount > versicolorCount and setosaCount > virginicaCount ):
-            return 'Iris-setosa'
-        elif (setosaCount < versicolorCount and virginicaCount < versicolorCount):
-            return 'Iris-versicolor'
-        elif(virginicaCount > versicolorCount and virginicaCount > setosaCount):
-            return 'Iris-virginica'
+        if(kamaCount > rosaCount and kamaCount > canadianCount ):
+            return '1'
+        elif (kamaCount < rosaCount and canadianCount < rosaCount):
+            return '2'
+        elif(canadianCount > rosaCount and canadianCount > kamaCount):
+            return '3'
         else:
             return "Neither"
         
     def homogeneousCheck(self,items):
         if(len(items) == 0):
-            return False 
-        print(self.decisionClassIndex)   
-        print(items)            
+            return False          
         homoCheck = items[0][self.decisionClassIndex]
-        print('homo')
-        print(homoCheck)
         
         for item in items:
             if(item[self.decisionClassIndex] != homoCheck):
@@ -294,8 +276,6 @@ class C45:
             for i in range(0, self.classes.__len__() - 1):
                 
                 if( i not in excludedClasses):           
-                    print('currentClass')
-                    print(self.classes[i])
                     currentClass = self.classes[i]
                     currentClassIndex = i
                     
@@ -335,12 +315,14 @@ class C45:
                         if(informationGain > maxGain):
                             maxListOfSlices = listOfSlices
                             classToSplitOn = currentClass
-                            maxValueSplitOn = valueSplitOn
                             maxAttributeIndex = i
+                            maxValueSplitOn = valueSplitOn
                             maxAttribute = self.classes[maxAttributeIndex]
                             maxGain = informationGain                       
                         
             
+            print('splitclass')
+            print(classToSplitOn)
             ## If the algorithm cannot choose an attribute to split on
             if(classToSplitOn == " "):
                 mostFrequentItem = self.mostFrequentItems(items)
@@ -377,20 +359,13 @@ class C45:
                         attributeIndex += 1 
                     else:
                         if(attributeIndex > 0):
-                            edge.setAttribute('var ', 'GTE ' + str(maxValueSplitOn))                                    
-                        else:                             
-                            edge.setAttribute('var ', 'LT ' + str(maxValueSplitOn))   
-                                                            
+                            edge.setAttribute('var ', 'GTE ' + str(maxValueSplitOn))               
+                        else:    
+                            edge.setAttribute('var ', 'LT ' + str(maxValueSplitOn))                                   
                     newNode.appendChild(edge)  
                     self.splitter(list, excludedClasses, edge) 
-                    attributeIndex += 1                   
-                         
-
-                   
-    def processData(self, node):
-        excludedClasses = {}       
-        self.splitter(self.items,excludedClasses,node) 
-        
+                    attributeIndex += 1               
+                        
     def parseTree(self,node,item):
         trueValue = False
         equalTrigger = False
@@ -461,19 +436,22 @@ class C45:
                 accuracyCount += 1
         print('accuracy')
         print(accuracyCount)
-        print(float(accuracyCount)/float(len(self.items)))
-           
+        print(float(accuracyCount)/float(len(self.items)))                         
+
+                   
+    def processData(self, node):
+        excludedClasses = {}       
+        self.splitter(self.items,excludedClasses,node)
+
 if __name__ == "__main__":
-    document = xml.dom.minidom.Document()
+    document = xml.dom.minidom.Document() 
     node = document.createElement('Tree')
     node.setAttribute('known', "Something")
     document.appendChild(node)
     
-    c = C45("iris/iris.data", "iris/domain.xml",document)
+    c = C45("seeds/seeds.csv", "seeds/domain.xml",document)
     c.fetcher()
-    c.processData(node)
+    c.processData(node)   
     print (document.toprettyxml())
     c.calculateAccuracy(node)
-       
-    
     

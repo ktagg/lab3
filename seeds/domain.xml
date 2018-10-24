@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<domain>
+	<variable name = "Kernal Area">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	<variable name = "Kernal Perimeter">
+		<group name = "Numerical" p ="0" />
+	</variable>	
+	<variable name = "Kernal Compactness">
+		<group name = "Numerical" p ="0" />
+	</variable>
+	<variable name = "Kernal Length">
+		<group name = "Numerical" p ="0" />
+	</variable>
+		<variable name = "Kernal Width">
+		<group name = "Numerical" p ="0" />
+	</variable>
+		<variable name = "Asymmetry Coefficient">
+		<group name = "Numerical" p ="0" />
+	</variable>
+		<variable name = "Kernal Groove Length">
+		<group name = "Numerical" p ="0" />
+	</variable>
+			  	
+  	<Category name = "Kernal Type">
+		<choice name = "Kama" type ="1" />
+		<choice name = "Rosa" type ="2" />
+		<choice name = "Canadian" type = "3"/>
+	</Category>
+</domain>
